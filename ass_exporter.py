@@ -2,10 +2,10 @@ import maya.cmds as cmds
 import datetime
 import pymel.core as pm
 
-def open_scene(filepath = "C:/Users/benja/Desktop/test.ma"):
-    if filepath:
+def open_scene(maya_filepath):
+    if maya_filepath:
         cmds.file(new=True, force=True) 
-        cmds.file(filepath, open=True)
+        cmds.file(maya_filepath, open=True)
 
 def set_render_settings():
     if not cmds.getAttr("defaultArnoldDriver.halfPrecision"):

@@ -12,4 +12,4 @@ def render(folder_path):
         for ass_file in os.listdir(ass_folder):
             pre, ext = os.path.splitext(ass_file)
             output_file = "{0}{1}".format(pre, file_format)
-            os.system('"{0}" -dp -dw -v 6 -i {1} -o {2}'.format(KICK_PATH, ass_file, output_file))
+            os.system('"{0}" -dp -dw -v 6 -i {1} -o {2}'.format(KICK_PATH, folder_path + "/" + ass_file, folder_path + "/" + output_file))
