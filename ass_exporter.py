@@ -1,5 +1,7 @@
-import maya.cmds as cmds
+import os
 import datetime
+
+import maya.cmds as cmds
 import pymel.core as pm
 
 def open_scene(maya_filepath):
@@ -30,4 +32,10 @@ def export(folder_path):
         
         cmds.currentTime(frame)
         frame_path = "{folder}<Scene>_<RenderLayer>_{date}_{frame}".format(folder=folder_path, date=date, frame=frame_padded)
-        pm.other.arnoldExportAss(filename=frame_path)    
+        pm.other.arnoldExportAss(filename=frame_path)
+
+def clean_ass_files(folder_path):
+    files = os.listdir(folder_path)
+    for file in files:
+        if not os.path.isdir(file) and ".ass" in file:
+            os.remove(os.path.abspath(os.path.join(folder_path, file)))
