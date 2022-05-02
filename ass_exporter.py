@@ -4,6 +4,7 @@ import datetime
 import maya.cmds as cmds
 import pymel.core as pm
 
+
 def open_scene(maya_filepath):
     if maya_filepath:
         cmds.file(new=True, force=True) 
@@ -31,7 +32,8 @@ def export(folder_path):
         frame_padded = str(frame).zfill(4)
         
         cmds.currentTime(frame)
-        frame_path = "{folder}<Scene>_<RenderLayer>_{date}_{frame}".format(folder=folder_path, date=date, frame=frame_padded)
+        frame_path = "{folder}\\\\<Scene>_<RenderLayer>_{date}_{frame}".format(folder=folder_path, date=date, frame=frame_padded)
+        print(frame_path)
         pm.other.arnoldExportAss(filename=frame_path)
 
 def clean_ass_files(folder_path):

@@ -1,5 +1,6 @@
 import os
 
+
 KICK_PATH = "C:/Program Files/Autodesk/Arnold/maya2020/bin/kick.exe"
 
 def render(folder_path):

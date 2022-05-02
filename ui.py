@@ -1,18 +1,9 @@
-__author__ = "Benjamin Danneville"
-__copyright__ = "Copyright 2022, One of Us"
-__version__ = "0.1.3"
-__maintainer__ = "Benjamin Danneville"
-__email__ = "benjamin-d@weacceptyou.com"
-__status__ = "Maintenance"
- 
- 
 import sys
- 
-from PyQt5 import QtCore
-from PyQt5 import QtWidgets
 
-import render
- 
+from PySide2 import QtCore
+from PySide2 import QtWidgets
+from PySide2 import QtGui
+
  
 class BDRenderer(QtWidgets.QDialog):
     def __init__(self):
@@ -26,6 +17,12 @@ class BDRenderer(QtWidgets.QDialog):
         self.setWindowTitle("BD Renderer")
         self.setMinimumHeight(280)
         self.setMinimumWidth(400)
+
+        # Background
+        palette_window = QtGui.QPalette()
+        palette_window.setColor(QtGui.QPalette.Window, QtGui.QColor(33, 35, 41, 255))
+
+        self.setPalette(palette_window)
     
         # Remove Question Mark
         #self.setWindowFlags(self.windowFlags() ^ QtCore.Qt.WindowContextHelpButtonHint)
@@ -43,8 +40,9 @@ class BDRenderer(QtWidgets.QDialog):
 
         self.le_output = QtWidgets.QLineEdit()
         #self.le_output.setReadOnly(True)
-        self.le_output.setPlaceholderText("output folder path")
-        self.pb_output = QtWidgets.QPushButton("OUTPUT")
+        self.le_output.setPlaceholderText("Choose an output folder path")
+        self.pb_output = QtWidgets.QPushButton("...")
+        self.pb_output.setFixedWidth(35)
 
     def create_layout(self):
         self.vbl_main = QtWidgets.QVBoxLayout(self)
@@ -56,14 +54,6 @@ class BDRenderer(QtWidgets.QDialog):
         self.tw_maya_files.horizontalHeader().setVisible(False)
 
         self.tw_maya_files.horizontalHeader().setStretchLastSection(True)
-
-        self.tw_maya_files.setRowCount(10)
-        for i in range(10):
-            name = "PATH {0}".format(i)
-            self.maya_files.append(name)
-            item = QtWidgets.QTableWidgetItem(name)
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
-            self.tw_maya_files.setItem(i, 0, item)
 
         self.hbl_lw_button = QtWidgets.QHBoxLayout()
         self.hbl_lw_button.addWidget(self.pb_add)
@@ -86,10 +76,6 @@ class BDRenderer(QtWidgets.QDialog):
         for selected_maya_file in self.selected_maya_files:
             if selected_maya_file.text() in self.maya_files:
                 self.maya_files.remove(selected_maya_file.text())
-            """
-            self.tw_maya_files.takeItem(selected_maya_file.row(), 0)
-            self.tw_maya_files.removeRow(selected_maya_file.row())
-            """
         
         self.update_maya_files()
 
@@ -112,9 +98,11 @@ class BDRenderer(QtWidgets.QDialog):
         for i in range(len(self.maya_files)):
             item = QtWidgets.QTableWidgetItem(self.maya_files[i])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setBackground(QtGui.QColor(63, 66, 76, 255))
             self.tw_maya_files.setItem(i, 0, item)
 
     def render(self):
+        import render
         render.render(self.le_output.text(), self.maya_files)
 
     def widget_connection(self):
