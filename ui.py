@@ -11,7 +11,7 @@ import sys
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
-import execute
+import render
  
  
 class BDRenderer(QtWidgets.QDialog):
@@ -115,7 +115,7 @@ class BDRenderer(QtWidgets.QDialog):
             self.tw_maya_files.setItem(i, 0, item)
 
     def render(self):
-        execute.render(self.le_output.text(), self.maya_files)
+        render.render(self.le_output.text(), self.maya_files)
 
     def widget_connection(self):
         self.pb_output.clicked.connect(self.output_clicked)
