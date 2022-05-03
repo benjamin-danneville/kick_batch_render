@@ -25,10 +25,10 @@ def set_render_settings():
 def export(folder_path):
     current_time = datetime.datetime.now()
     date = "{year}{month}{date}".format(year=current_time.year, month=current_time.month, date=current_time.day)
-
-    #cmds.workspace(fileRule=['translatorData', folder_path])
     
-    for frame in range(1, 10 + 1):
+    render_start_frame = int(cmds.getAttr("defaultRenderGlobals.startFrame"))
+    render_end_frame = int(cmds.getAttr("defaultRenderGlobals.endFrame"))
+    for frame in range(render_start_frame, render_end_frame + 1):
         frame_padded = str(frame).zfill(4)
         
         cmds.currentTime(frame)
