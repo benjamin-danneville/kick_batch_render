@@ -25,7 +25,7 @@ class BDRenderer(QtWidgets.QDialog):
         self.setPalette(palette_window)
     
         # Remove Question Mark
-        #self.setWindowFlags(self.windowFlags() ^ QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() ^ QtCore.Qt.WindowContextHelpButtonHint)
     
         # UI
         self.create_widget()
@@ -39,8 +39,19 @@ class BDRenderer(QtWidgets.QDialog):
         self.pb_remove = QtWidgets.QPushButton("REMOVE")
 
         self.le_output = QtWidgets.QLineEdit()
+
+        self.palette_le_output = self.le_output.palette()
+        self.palette_le_output.setColor(QtGui.QPalette.Base, QtGui.QColor(63, 66, 76, 255))
+        self.le_output.setPalette(self.palette_le_output)
         #self.le_output.setReadOnly(True)
+
+        self.palette_le_output_place_holder = self.le_output.palette()
+        self.palette_le_output_place_holder.setColor(QtGui.QPalette.PlaceholderText, QtGui.QColor(255, 255, 255, 255))
+        self.le_output.setPalette(self.palette_le_output_place_holder)
+
         self.le_output.setPlaceholderText("Choose an output folder path")
+
+
         self.pb_output = QtWidgets.QPushButton("...")
         self.pb_output.setFixedWidth(35)
 
@@ -49,6 +60,10 @@ class BDRenderer(QtWidgets.QDialog):
 
         self.tw_maya_files = QtWidgets.QTableWidget()
         self.tw_maya_files.setColumnCount(1)
+
+        palette_tw_maya_files = self.tw_maya_files.palette()
+        palette_tw_maya_files.setColor(QtGui.QPalette.Base, QtGui.QColor(63, 66, 76, 255))
+        self.tw_maya_files.setPalette(palette_tw_maya_files)
 
         self.tw_maya_files.verticalHeader().setVisible(False)
         self.tw_maya_files.horizontalHeader().setVisible(False)
@@ -70,14 +85,21 @@ class BDRenderer(QtWidgets.QDialog):
 
     def output_clicked(self):
         folder_filepath = QtWidgets.QFileDialog.getExistingDirectory(self, "Select the output renders folder")
-        self.le_output.setText(folder_filepath)
+        if folder_filepath:
+            self.le_output.setText(folder_filepath)
+            self.palette_le_output.setColor(QtGui.QPalette.Base, QtGui.QColor(105, 115, 130, 255))
+            self.le_output.setPalette(self.palette_le_output)
 
     def remove_clicked(self):
-        for selected_maya_file in self.selected_maya_files:
-            if selected_maya_file.text() in self.maya_files:
-                self.maya_files.remove(selected_maya_file.text())
+        try:
+            for selected_maya_file in self.selected_maya_files:
+                if selected_maya_file.text() in self.maya_files:
+                    self.maya_files.remove(selected_maya_file.text())
         
-        self.update_maya_files()
+            self.update_maya_files()
+        
+        except TypeError:
+            print("No items has been selected")
 
     def add_clicked(self):
         maya_filepaths, check = QtWidgets.QFileDialog.getOpenFileNames(self, 'Open a maya file', '', 'Maya Ascii Files (*.ma);;All files (*.*)')
@@ -91,6 +113,16 @@ class BDRenderer(QtWidgets.QDialog):
     def maya_file_selected(self):
         self.selected_maya_files = self.tw_maya_files.selectedItems()
 
+    def text_changed(self):
+        if self.le_output.text():
+            self.palette_le_output.setColor(QtGui.QPalette.Base, QtGui.QColor(105, 115, 130, 255))
+            self.le_output.setPalette(self.palette_le_output)
+        else:
+            self.palette_le_output.setColor(QtGui.QPalette.Base, QtGui.QColor(63, 66, 76, 255))
+            self.le_output.setPalette(self.palette_le_output)
+            self.palette_le_output_place_holder.setColor(QtGui.QPalette.PlaceholderText, QtGui.QColor(255, 255, 255, 255))
+            self.le_output.setPalette(self.palette_le_output_place_holder)
+
     def update_maya_files(self):
         self.tw_maya_files.clear()
         self.tw_maya_files.setRowCount(len(self.maya_files))
@@ -98,7 +130,7 @@ class BDRenderer(QtWidgets.QDialog):
         for i in range(len(self.maya_files)):
             item = QtWidgets.QTableWidgetItem(self.maya_files[i])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
-            item.setBackground(QtGui.QColor(63, 66, 76, 255))
+            item.setBackground(QtGui.QColor(105, 115, 130, 255))
             self.tw_maya_files.setItem(i, 0, item)
 
     def render(self):
@@ -111,6 +143,7 @@ class BDRenderer(QtWidgets.QDialog):
         self.tw_maya_files.itemSelectionChanged.connect(self.maya_file_selected)
         self.pb_remove.clicked.connect(self.remove_clicked)
         self.pb_render.clicked.connect(self.render)
+        self.le_output.textChanged.connect(self.text_changed)
  
 
 if __name__ == '__main__':
