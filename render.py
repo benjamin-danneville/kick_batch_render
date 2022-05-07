@@ -18,11 +18,12 @@ def render(output_folder_basepath, maya_filepaths):
         ass_exporter.open_scene(maya_filepath)
         ass_exporter.set_render_settings()
         for layer in cmds.ls(type='renderLayer'):
-            if cmds.getAttr("{0}.renderable".format(layer)):
-                cmds.editRenderLayerGlobals(currentRenderLayer=layer)
-                ass_exporter.export(output_folder_path)
-                command_builder.render(output_folder_path)
-                ass_exporter.clean_ass_files(output_folder_path)
+            if not ":" in layer:
+                if cmds.getAttr("{0}.renderable".format(layer)):
+                    cmds.editRenderLayerGlobals(currentRenderLayer=layer)
+                    ass_exporter.export(output_folder_path)
+                    command_builder.render(output_folder_path)
+                    ass_exporter.clean_ass_files(output_folder_path)
 
         print("{0} has been rendered".format(maya_filepath))
     
