@@ -38,22 +38,32 @@ class BDRenderer(QtWidgets.QDialog):
         self.pb_add = QtWidgets.QPushButton("ADD")
         self.pb_remove = QtWidgets.QPushButton("REMOVE")
 
+        self.cb_step = QtWidgets.QCheckBox("Step")
+        self.cb_stylesheet = "QCheckBox {border: none; color: white;}"
+        self.cb_step.setStyleSheet(self.cb_stylesheet)
+
+        self.le_step = QtWidgets.QLineEdit()
+        self.le_step.setValidator(QtGui.QIntValidator())
+        self.le_step.setFixedWidth(50)
+        self.le_step.setEnabled(False)
+        self.le_step.setStyleSheet("color: white;  background-color: black")
+
         self.le_output = QtWidgets.QLineEdit()
-
-        self.palette_le_output = self.le_output.palette()
-        self.palette_le_output.setColor(QtGui.QPalette.Base, QtGui.QColor(63, 66, 76, 255))
-        self.le_output.setPalette(self.palette_le_output)
         #self.le_output.setReadOnly(True)
-
-        self.palette_le_output_place_holder = self.le_output.palette()
-        self.palette_le_output_place_holder.setColor(QtGui.QPalette.PlaceholderText, QtGui.QColor(255, 255, 255, 255))
-        self.le_output.setPalette(self.palette_le_output_place_holder)
 
         self.le_output.setPlaceholderText("Choose an output folder path")
 
-
         self.pb_output = QtWidgets.QPushButton("...")
         self.pb_output.setFixedWidth(35)
+
+        # Palette
+        self.palette_le_output = self.le_output.palette()
+        self.palette_le_output.setColor(QtGui.QPalette.Base, QtGui.QColor(63, 66, 76, 255))
+        self.le_output.setPalette(self.palette_le_output)
+        
+        self.palette_le_output_place_holder = self.le_output.palette()
+        self.palette_le_output_place_holder.setColor(QtGui.QPalette.PlaceholderText, QtGui.QColor(255, 255, 255, 255))
+        self.le_output.setPalette(self.palette_le_output_place_holder)
 
     def create_layout(self):
         self.vbl_main = QtWidgets.QVBoxLayout(self)
@@ -78,8 +88,18 @@ class BDRenderer(QtWidgets.QDialog):
         self.hbl_output_button.addWidget(self.le_output)
         self.hbl_output_button.addWidget(self.pb_output)
 
+        self.hbl_settings = QtWidgets.QHBoxLayout()
+
+        self.vbl_step = QtWidgets.QVBoxLayout()
+        self.vbl_step.addWidget(self.cb_step)
+        self.vbl_step.addWidget(self.le_step)
+
+        self.hbl_settings.addLayout(self.vbl_step)
+        self.hbl_settings.setAlignment(QtCore.Qt.AlignLeft)
+
         self.vbl_main.addWidget(self.tw_maya_files)
         self.vbl_main.addLayout(self.hbl_lw_button)
+        self.vbl_main.addLayout(self.hbl_settings)
         self.vbl_main.addLayout(self.hbl_output_button)
         self.vbl_main.addWidget(self.pb_render)
 
@@ -132,10 +152,18 @@ class BDRenderer(QtWidgets.QDialog):
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             item.setBackground(QtGui.QColor(105, 115, 130, 255))
             self.tw_maya_files.setItem(i, 0, item)
+    
+    def step_state_changed(self, state):
+        if state:
+            self.le_step.setStyleSheet("color: white;  background-color: rgb(105,115,130)")
+            self.le_step.setEnabled(True)
+        else:
+            self.le_step.setStyleSheet("color: white;  background-color: black")
+            self.le_step.setEnabled(False)  
 
     def render(self):
         import render
-        render.render(self.le_output.text(), self.maya_files)
+        render.render(self.le_output.text(), self.maya_files, self.le_step)
 
     def widget_connection(self):
         self.pb_output.clicked.connect(self.output_clicked)
@@ -144,6 +172,7 @@ class BDRenderer(QtWidgets.QDialog):
         self.pb_remove.clicked.connect(self.remove_clicked)
         self.pb_render.clicked.connect(self.render)
         self.le_output.textChanged.connect(self.text_changed)
+        self.cb_step.stateChanged.connect(self.step_state_changed)
  
 
 if __name__ == '__main__':

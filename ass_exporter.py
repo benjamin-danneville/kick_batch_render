@@ -10,12 +10,16 @@ def open_scene(maya_filepath):
         cmds.file(new=True, force=True) 
         cmds.file(maya_filepath, open=True)
 
-def set_render_settings():
+def set_render_settings(le_step):
     if not cmds.getAttr("defaultArnoldDriver.halfPrecision"):
         cmds.setAttr("defaultArnoldDriver.halfPrecision", 1)
 
     if not cmds.getAttr("defaultArnoldDriver.mergeAOVs"):
         cmds.setAttr("defaultArnoldDriver.mergeAOVs", 1)
+
+    if le_step.isEnabled():
+        if le_step.text():
+            cmds.setAttr("defaultRenderGlobals.byFrameStep", int(le_step.text()))
     
     """
     if not cmds.getAttr("defaultArnoldRenderOptions.renderType"):
