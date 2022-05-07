@@ -28,7 +28,8 @@ def export(folder_path):
     
     render_start_frame = int(cmds.getAttr("defaultRenderGlobals.startFrame"))
     render_end_frame = int(cmds.getAttr("defaultRenderGlobals.endFrame"))
-    for frame in range(render_start_frame, render_end_frame + 1):
+    render_step = int(cmds.getAttr("defaultRenderGlobals.byFrameStep"))
+    for frame in range(render_start_frame, render_end_frame + 1, render_step):
         frame_padded = str(frame).zfill(4)
         
         cmds.currentTime(frame)
