@@ -1,3 +1,5 @@
+# This Python file uses the following encoding: utf-8
+
 import sys
 
 from PySide2 import QtCore
@@ -15,7 +17,7 @@ class BDRenderer(QtWidgets.QDialog):
 
         # Window title and minimum width
         self.setWindowTitle("BD Renderer")
-        self.setMinimumHeight(280)
+        self.setMinimumHeight(395)
         self.setMinimumWidth(400)
 
         # Background
@@ -31,8 +33,18 @@ class BDRenderer(QtWidgets.QDialog):
         self.create_widget()
         self.create_layout()
         self.widget_connection()
+        self.create_shortcuts()
   
     def create_widget(self):
+        self.pb_up = QtWidgets.QPushButton("▲")
+        self.pb_up.setFixedWidth(30)
+        self.pb_up.setMinimumHeight(100)
+        self.pb_up.setMaximumHeight(500)
+        self.pb_down = QtWidgets.QPushButton("▼")
+        self.pb_down.setFixedWidth(30)
+        self.pb_down.setMinimumHeight(100)
+        self.pb_down.setMaximumHeight(500)
+
         self.pb_render = QtWidgets.QPushButton("RENDER FILES")
 
         self.pb_add = QtWidgets.QPushButton("ADD")
@@ -68,8 +80,14 @@ class BDRenderer(QtWidgets.QDialog):
     def create_layout(self):
         self.vbl_main = QtWidgets.QVBoxLayout(self)
 
+        self.hbl_maya_files = QtWidgets.QHBoxLayout()
+
         self.tw_maya_files = QtWidgets.QTableWidget()
+        #self.tw_maya_files.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
+
         self.tw_maya_files.setColumnCount(1)
+
+        self.vbl_maya_files_button = QtWidgets.QVBoxLayout()
 
         palette_tw_maya_files = self.tw_maya_files.palette()
         palette_tw_maya_files.setColor(QtGui.QPalette.Base, QtGui.QColor(63, 66, 76, 255))
@@ -90,6 +108,12 @@ class BDRenderer(QtWidgets.QDialog):
 
         self.hbl_settings = QtWidgets.QHBoxLayout()
 
+        self.vbl_maya_files_button.addWidget(self.pb_up)
+        self.vbl_maya_files_button.addWidget(self.pb_down)
+
+        self.hbl_maya_files.addWidget(self.tw_maya_files)
+        self.hbl_maya_files.addLayout(self.vbl_maya_files_button)
+
         self.vbl_step = QtWidgets.QVBoxLayout()
         self.vbl_step.addWidget(self.cb_step)
         self.vbl_step.addWidget(self.le_step)
@@ -97,7 +121,7 @@ class BDRenderer(QtWidgets.QDialog):
         self.hbl_settings.addLayout(self.vbl_step)
         self.hbl_settings.setAlignment(QtCore.Qt.AlignLeft)
 
-        self.vbl_main.addWidget(self.tw_maya_files)
+        self.vbl_main.addLayout(self.hbl_maya_files)
         self.vbl_main.addLayout(self.hbl_lw_button)
         self.vbl_main.addLayout(self.hbl_settings)
         self.vbl_main.addLayout(self.hbl_output_button)
@@ -160,6 +184,37 @@ class BDRenderer(QtWidgets.QDialog):
         else:
             self.le_step.setStyleSheet("color: white;  background-color: black")
             self.le_step.setEnabled(False)  
+    
+    def move_maya_file(self, move_number):
+        try:
+            if not len(self.selected_maya_files) > 1:
+                new_index = None
+                for selected_maya_file in self.selected_maya_files:
+                    if selected_maya_file.text() in self.maya_files:
+                        old_index = self.maya_files.index(selected_maya_file.text())
+                        if old_index == 0 and move_number < 0:
+                            new_index = old_index
+                        elif old_index == len(self.maya_files) - 1 and move_number > 0:
+                            new_index = old_index
+                        else:
+                            new_index = old_index + move_number
+
+                        self.maya_files.remove(selected_maya_file.text())
+                        self.maya_files.insert(new_index, selected_maya_file.text())
+            
+                self.update_maya_files()
+                self.tw_maya_files.selectRow(new_index)
+
+            else:
+                print("You must select only one item to move it up or down")
+        except TypeError:
+            print("No items has been selected")
+
+    def move_maya_file_up(self):
+        self.move_maya_file(-1)
+
+    def move_maya_file_down(self):
+        self.move_maya_file(1)
 
     def render(self):
         import render
@@ -173,6 +228,16 @@ class BDRenderer(QtWidgets.QDialog):
         self.pb_render.clicked.connect(self.render)
         self.le_output.textChanged.connect(self.text_changed)
         self.cb_step.stateChanged.connect(self.step_state_changed)
+        self.pb_up.clicked.connect(self.move_maya_file_up)
+        self.pb_down.clicked.connect(self.move_maya_file_down)
+
+    def create_shortcuts(self):
+        self.sc_up = QtWidgets.QShortcut(QtGui.QKeySequence('Up'), self)
+        self.sc_up.activated.connect(self.move_maya_file_up)
+        self.sc_down = QtWidgets.QShortcut(QtGui.QKeySequence('Down'), self)
+        self.sc_down.activated.connect(self.move_maya_file_down)
+        self.sc_remove = QtWidgets.QShortcut(QtGui.QKeySequence('Del'), self)
+        self.sc_remove.activated.connect(self.remove_clicked)
  
 
 if __name__ == '__main__':
