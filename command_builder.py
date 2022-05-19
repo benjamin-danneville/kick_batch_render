@@ -14,4 +14,4 @@ def render(folder_path):
             if ".ass" in file:
                 pre = (os.path.splitext(file))[0]
                 output_file = "{0}{1}".format(pre, file_format)
-                os.system('"{0}" -dp -dw -v 6 -i {1} -o {2}'.format(KICK_PATH, folder_path + "/" + file, folder_path + "/" + output_file))
+                os.system('"{0}" -dp -dw -v 1 -i {1} -o {2}'.format(KICK_PATH, folder_path + "/" + file, folder_path + "/" + output_file))
